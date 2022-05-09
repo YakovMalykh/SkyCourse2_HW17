@@ -1,4 +1,4 @@
-import Exceptions.NotFoubdElement;
+import Exceptions.NotFoundElement;
 import Exceptions.PassingNullToParameterException;
 import Exceptions.IntOutOfBoundException;
 
@@ -18,6 +18,16 @@ public class IntListImpl implements IntList {
         this.arrayInt = new int[size];
         this.size = size;
     }
+    @Override
+    public int[] getArrayInt() {
+        return arrayInt;
+    }
+
+    @Override
+    public int getSize() {
+        return size();
+    }
+
 
     private void sort(int[] arr) {
         SortMethods.sortInsertion(arr);
@@ -40,31 +50,22 @@ public class IntListImpl implements IntList {
         return false;
     }
 
-    @Override
-    public int[] getArrayInt() {
-        return arrayInt;
-    }
 
-    @Override
-    public int getSize() {
-        return size;
-    }
-
-    private void checkParametrs(int number) {
-        if (number < 0 || number >= arrayInt.length) {
+    private void checkIndex(int index) {
+        if (index < 0 || index >= arrayInt.length) {
             throw new PassingNullToParameterException("в качестве параметра передано отрицательное " +
                     "число или индекс за пределами массива");
         }
     }
 
-    private void createNewArrayGreaterleLenght() {
-        int[] newArrayString = new int[size + 1];
+    private void createNewArrayGreaterThanLenght() {
+        int[] newArrayString = new int[size*2+1];
         for (int i = 0; i < arrayInt.length; i++) {
             if (arrayInt[i] != 0) {
                 newArrayString[i] = arrayInt[i];
             }
         }
-        size++;
+        size=size();
         arrayInt = newArrayString;
     }
 
@@ -72,11 +73,11 @@ public class IntListImpl implements IntList {
     @Override
     public int add(int item) {
         if (size == 0) {
-            createNewArrayGreaterleLenght();
+            createNewArrayGreaterThanLenght();
         }
         for (int i = 0; i < arrayInt.length; i++) {
             if (arrayInt[arrayInt.length - 1] != 0) {
-                createNewArrayGreaterleLenght();
+                createNewArrayGreaterThanLenght();
             } else if (arrayInt[i] == 0) {
                 arrayInt[i] = item;
                 return item;
@@ -88,14 +89,14 @@ public class IntListImpl implements IntList {
     @Override
     public int add(int index, int item) {
         if (size == 0) {
-            createNewArrayGreaterleLenght();
+            createNewArrayGreaterThanLenght();
         }
-        checkParametrs(index);
+        checkIndex(index);
         if (arrayInt[index] == 0) {
             arrayInt[index] = item;
             return item;
         } else if (arrayInt[index] != 0) {
-            createNewArrayGreaterleLenght();
+            createNewArrayGreaterThanLenght();
             for (int i = arrayInt.length - 1; i > index; i--) {
                 arrayInt[i] = arrayInt[i - 1];
 //                }
@@ -108,7 +109,7 @@ public class IntListImpl implements IntList {
 
     @Override
     public int set(int index, int item) {
-        checkParametrs(index);
+        checkIndex(index);
         arrayInt[index] = item;
         return arrayInt[index];
     }
@@ -118,21 +119,21 @@ public class IntListImpl implements IntList {
     public int removeValue(int item) {
         int index = indexOf(item);
         if (index < 0) {
-            throw new NotFoubdElement("такого элемента не существует");
+            throw new NotFoundElement("такого элемента не существует");
         }
         return remove(index);
     }
 
     @Override
     public int remove(int index) {
-        checkParametrs(index);
+        checkIndex(index);
         if (arrayInt[index] != 0) {
             int result = arrayInt[index];
             arrayInt[index] = 0;
             for (int i = index; i < arrayInt.length - 1; i++) {
                 arrayInt[i] = arrayInt[i + 1];
             }
-            size--;
+            size=size();
             int[] newArray = new int[size];
             for (int j = 0; j < size; j++) {
                 if (arrayInt[j] != 0) {
@@ -147,15 +148,9 @@ public class IntListImpl implements IntList {
 
     @Override
     public boolean contains(int item) {
-        sort(arrayInt);
-        return binarySearch(arrayInt, item);
-
-//        for (int i = 0; i < arrayInt.length; i++) {
-//            if (arrayInt[i] == item) {
-//                return true;
-//            }
-//        }
-//        return false;
+        int[] result = Arrays.copyOf(arrayInt,arrayInt.length);
+        sort(result);
+        return binarySearch(result, item);
     }
 
     @Override
@@ -180,7 +175,7 @@ public class IntListImpl implements IntList {
 
     @Override
     public int get(int index) {
-        checkParametrs(index);
+        checkIndex(index);
         if (arrayInt[index] != 0) {
             return arrayInt[index];
         }
@@ -192,8 +187,8 @@ public class IntListImpl implements IntList {
         if (otherList == null) {
             throw new PassingNullToParameterException("в качестве параметра передан null");
         }
-        if (size == otherList.getSize()) {
-            for (int i = 0; i < size; i++) {
+        if (size() == otherList.getSize()) {
+            for (int i = 0; i < size(); i++) {
                 if (arrayInt[i] != (otherList.getArrayInt()[i])) {
                     return false;
                 }
@@ -205,7 +200,13 @@ public class IntListImpl implements IntList {
 
     @Override
     public int size() {
-        return getSize();
+        int counter=0;
+        for (int i = 0; i < arrayInt.length; i++) {
+            if (arrayInt[i] != 0) {
+                counter++;
+            }
+        }
+        return counter;
     }
 
     @Override
@@ -223,13 +224,13 @@ public class IntListImpl implements IntList {
         for (int i = 0; i < arrayInt.length; i++) {
             arrayInt[i] = 0;
         }
-        arrayInt = new int[0];
+        setSize(size());
     }
 
     @Override
     public int[] toArray() {
-        int[] newArray = new int[size];
-        for (int i = 0; i < size(); i++) {
+        int[] newArray = new int[arrayInt.length];
+        for (int i = 0; i < arrayInt.length; i++) {
             newArray[i] = arrayInt[i];
         }
         return newArray;
@@ -239,7 +240,7 @@ public class IntListImpl implements IntList {
     public String toString() {
         return "IntListImpl" +
                 "arrayInt=" + Arrays.toString(arrayInt) +
-                ", size=" + size +
+                ", size=" + size() +
                 '}';
     }
 
