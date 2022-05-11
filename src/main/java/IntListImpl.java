@@ -18,6 +18,7 @@ public class IntListImpl implements IntList {
         this.arrayInt = new int[size];
         this.size = size;
     }
+
     @Override
     public int[] getArrayInt() {
         return arrayInt;
@@ -30,21 +31,21 @@ public class IntListImpl implements IntList {
 
 
     private void sort(int[] arr) {
-        SortMethods.sortInsertion(arr);
+        SortMethods.quickSort(arr,0,arr.length-1);
     }
 
-    public static boolean binarySearch(int[]arr, int el) {
+    public static boolean binarySearch(int[] arr, int el) {
         int min = 0;
-        int max = arr.length-1;
+        int max = arr.length - 1;
         while (min <= max) {
-            int mid = (min+max)/2;
+            int mid = (min + max) / 2;
             if (el == arr[mid]) {
                 return true;
             }
             if (el < arr[mid]) {
-                max=mid-1;
-            }else {
-                min=mid+1;
+                max = mid - 1;
+            } else {
+                min = mid + 1;
             }
         }
         return false;
@@ -58,26 +59,26 @@ public class IntListImpl implements IntList {
         }
     }
 
-    private void createNewArrayGreaterThanLenght() {
-        int[] newArrayString = new int[size*2+1];
+    private void grow() {
+        int[] newArrayString = new int[(int) (size * 1.5 + 1)];
         for (int i = 0; i < arrayInt.length; i++) {
             if (arrayInt[i] != 0) {
                 newArrayString[i] = arrayInt[i];
             }
         }
-        size=size();
+        size = size();
         arrayInt = newArrayString;
     }
 
 
-    @Override
+    @Override//шаг2 из ДЗ реализовал в предыдущей домашней работе
     public int add(int item) {
         if (size == 0) {
-            createNewArrayGreaterThanLenght();
+            grow();
         }
         for (int i = 0; i < arrayInt.length; i++) {
             if (arrayInt[arrayInt.length - 1] != 0) {
-                createNewArrayGreaterThanLenght();
+                grow();
             } else if (arrayInt[i] == 0) {
                 arrayInt[i] = item;
                 return item;
@@ -89,14 +90,14 @@ public class IntListImpl implements IntList {
     @Override
     public int add(int index, int item) {
         if (size == 0) {
-            createNewArrayGreaterThanLenght();
+            grow();
         }
         checkIndex(index);
         if (arrayInt[index] == 0) {
             arrayInt[index] = item;
             return item;
         } else if (arrayInt[index] != 0) {
-            createNewArrayGreaterThanLenght();
+            grow();
             for (int i = arrayInt.length - 1; i > index; i--) {
                 arrayInt[i] = arrayInt[i - 1];
 //                }
@@ -133,7 +134,8 @@ public class IntListImpl implements IntList {
             for (int i = index; i < arrayInt.length - 1; i++) {
                 arrayInt[i] = arrayInt[i + 1];
             }
-            size=size();
+            arrayInt[arrayInt.length - 1] = 0;
+            size = size;
             int[] newArray = new int[size];
             for (int j = 0; j < size; j++) {
                 if (arrayInt[j] != 0) {
@@ -148,7 +150,7 @@ public class IntListImpl implements IntList {
 
     @Override
     public boolean contains(int item) {
-        int[] result = Arrays.copyOf(arrayInt,arrayInt.length);
+        int[] result = Arrays.copyOf(arrayInt, arrayInt.length);
         sort(result);
         return binarySearch(result, item);
     }
@@ -200,7 +202,7 @@ public class IntListImpl implements IntList {
 
     @Override
     public int size() {
-        int counter=0;
+        int counter = 0;
         for (int i = 0; i < arrayInt.length; i++) {
             if (arrayInt[i] != 0) {
                 counter++;

@@ -13,6 +13,7 @@ public class Main {
         }
         int[] numbers2 = copyOf(numbers1, numbers1.length);
         int[] numbers3 = copyOf(numbers1, numbers1.length);
+        int[] numbers4 = copyOf(numbers1, numbers1.length);
 
 
         long start1 = System.currentTimeMillis();
@@ -26,6 +27,13 @@ public class Main {
         long start3 = System.currentTimeMillis();
         SortMethods.sortInsertion(numbers3);
         System.out.println("Insertion - " + (System.currentTimeMillis() - start3));
+
+        long start4 = System.currentTimeMillis();
+        SortMethods.quickSort(numbers4,0,numbers4.length-1);
+        System.out.println("quickSort - " + (System.currentTimeMillis() - start4));
+
+
+
 
 
 
